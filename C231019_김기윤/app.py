@@ -1,4 +1,4 @@
-import os
+# app.py -- 우리 반 성적 분석 대시보드 (화면)
 import streamlit as st
 from utils import (total_score, average_score, to_grade, grade_to_gpa,
                    subject_average, subject_top, grade_distribution,
@@ -7,11 +7,7 @@ from utils import (total_score, average_score, to_grade, grade_to_gpa,
 st.set_page_config(page_title="성적 분석 대시보드", layout="wide")
 
 # 상단 배너 이미지 (banner.png 파일을 함께 둘 것)
-banner_path = os.path.join(os.path.dirname(__file__), "banner.png")
-if os.path.exists(banner_path):
-    st.image(banner_path, width="stretch")
-else:
-    st.warning("배너 이미지를 찾을 수 없습니다. (banner.png 파일을 함께 업로드했는지 확인해주세요.)")
+st.image("banner.png", width="stretch")
 st.title("우리 반 성적 분석 대시보드")
 
 SUBJECTS = ["국어", "영어", "수학"]
@@ -37,8 +33,8 @@ with tab1:
     kor = st.number_input("국어", 0, 100, 0)
     eng = st.number_input("영어", 0, 100, 0)
     mat = st.number_input("수학", 0, 100, 0)
-    if st.button("추가"):  # 콜론(:) 추가
-        students.append({"이름": name, "국어": kor, "영어": eng, "수학": mat})
+    if st.button("추가"):
+        st.session_state.students.append({"이름": name, "국어": kor, "영어": eng, "수학": mat})
         st.success(f"{name} 학생을 추가했습니다.")
 
 # --- 상단 요약 지표 ---
@@ -75,7 +71,6 @@ with tab3:
         subject = SUBJECTS[i]
         with cols[i]:
             st.subheader(subject)
-            # f-string 적용으로 문자열 병합 오류 해결
             st.write(f"평균: {subject_average(students, subject):.2f}")
             st.write(f"최고: {subject_top(students, subject)}")
 
@@ -96,6 +91,6 @@ with tab4:
     st.table(rank_table)
 
     st.header("학점 분포")
-    dist = grade_distribution(students)  # studets -> students 오타 수정
+    dist = grade_distribution(students)
     dist_data = [{"학점": g, "인원": dist[g]} for g in ["A", "B", "C", "D", "F"]]
     st.bar_chart(dist_data, x="학점", y="인원", horizontal=True, height=400)

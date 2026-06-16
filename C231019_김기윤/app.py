@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from utils import (total_score, average_score, to_grade, grade_to_gpa,
                    subject_average, subject_top, grade_distribution,
@@ -6,7 +7,11 @@ from utils import (total_score, average_score, to_grade, grade_to_gpa,
 st.set_page_config(page_title="성적 분석 대시보드", layout="wide")
 
 # 상단 배너 이미지 (banner.png 파일을 함께 둘 것)
-st.image("banner.png", width="stretch")
+banner_path = os.path.join(os.path.dirname(__file__), "banner.png")
+if os.path.exists(banner_path):
+    st.image(banner_path, width="stretch")
+else:
+    st.warning("배너 이미지를 찾을 수 없습니다. (banner.png 파일을 함께 업로드했는지 확인해주세요.)")
 st.title("우리 반 성적 분석 대시보드")
 
 SUBJECTS = ["국어", "영어", "수학"]

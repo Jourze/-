@@ -1,5 +1,6 @@
 # app.py -- 우리 반 성적 분석 대시보드 (화면)
 import os
+import json
 import streamlit as st
 from utils import (total_score, average_score, to_grade, grade_to_gpa,
                    subject_average, subject_top, grade_distribution,
@@ -14,16 +15,30 @@ st.image(banner_path, width="stretch")
 st.title("우리 반 성적 분석 대시보드")
 
 SUBJECTS = ["국어", "영어", "수학"]
+DATA_FILE = os.path.join(current_dir, "students.json")
+
+def save_data(data):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    else:
+        default_data = [
+            {"이름": "김민준", "국어": 92,  "영어": 85, "수학": 78},
+            {"이름": "이서연", "국어": 88,  "영어": 90, "수학": 95},
+            {"이름": "박도윤", "국어": 60,  "영어": 55, "수학": 72},
+            {"이름": "최지우", "국어": 100, "영어": 80, "수학": 90},
+            {"이름": "정하준", "국어": 45,  "영어": 60, "수학": 58},
+        ]
+        save_data(default_data)
+        return default_data
 
 # 처음 실행 시 샘플 학생 데이터를 세션에 넣어 둔다. (다시 실행돼도 유지)
 if "students" not in st.session_state:
-    st.session_state.students = [
-        {"이름": "김민준", "국어": 92,  "영어": 85, "수학": 78},
-        {"이름": "이서연", "국어": 88,  "영어": 90, "수학": 95},
-        {"이름": "박도윤", "국어": 60,  "영어": 55, "수학": 72},
-        {"이름": "최지우", "국어": 100, "영어": 80, "수학": 90},
-        {"이름": "정하준", "국어": 45,  "영어": 60, "수학": 58},
-    ]
+    st.session_state.students = load_data()
 
 students = st.session_state.students
 
@@ -38,6 +53,7 @@ with tab1:
     mat = st.number_input("수학", 0, 100, 0)
     if st.button("추가"):
         st.session_state.students.append({"이름": name, "국어": kor, "영어": eng, "수학": mat})
+        save_data(st.session_state.students)
         st.success(f"{name} 학생을 추가했습니다.")
 
 # --- 상단 요약 지표 ---
